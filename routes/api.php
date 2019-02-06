@@ -13,11 +13,18 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 Route::post('/register/company','Auth\RegisterController@registerCompany');
 Route::post('/register/client','Auth\RegisterController@registerClient');
+Route::post('login', 'Auth\LoginController@login');
 
-Route::get('/companies','CompanyController@index');
+Route::group(['middleware' => 'jwt.auth:client'], function () {
+    Route::get('/branches','BranchController@index');    
+});
+
+Route::group(['middleware' => 'jwt.auth:company'], function () {
+    Route::get('/companies','CompanyController@index');
+    Route::put('/change-capacity','CompanyController@changeCapacity');
+    Route::put('/change-price','CompanyController@changePrice');
+    Route::put('/change-hours','CompanyController@changeHours');
+    Route::post('/add-branch','CompanyController@addBranch');    
+});
